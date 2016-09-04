@@ -303,7 +303,14 @@ class RoleBehavior extends Behavior
         $model = $this->getRoleRelationModel();
 
         $relation = $this->owner->getRelation($this->roleRelation);
-        list($ownerReferenceAttribute) = array_keys($relation->link);
+        if (count($relation->link) > 1) {
+            foreach ($relation->link as $from => $to) {
+                $model->{$from} = $this->owner->$to;
+            }
+        } else {
+            list($ownerReferenceAttribute) = array_keys($relation->link);
+            $model->{$ownerReferenceAttribute} = $this->owner->getPrimaryKey();
+        }
 
         $model->{$ownerReferenceAttribute} = $this->owner->getPrimaryKey();
         $model->save(false);
